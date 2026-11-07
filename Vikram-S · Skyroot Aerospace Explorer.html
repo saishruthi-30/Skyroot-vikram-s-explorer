@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vikram-S · Skyroot Aerospace Explorer</title>
+<style>
+:root{color-scheme:dark;--bg:#04060d;--pn:#0c1222;--ln:#1e2a48;--tx:#e8edf8;--mu:#8e9bb8;--sf:#ff9933;--gr:#19c37d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{background:radial-gradient(1200px 600px at 20% -10%,#14234d55,transparent),var(--bg);min-height:100vh}
+header{padding:18px 24px 6px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:clamp(22px,4vw,36px);letter-spacing:.5px;background:linear-gradient(90deg,var(--sf),#fff,var(--gr));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mu);font-size:13px;margin-top:4px}
+main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:16px;padding:12px 24px 28px}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:10px 12px}}
+.stage{position:relative;height:min(78vh,760px);min-height:460px;border:1px solid var(--ln);border-radius:18px;overflow:hidden;background:radial-gradient(circle at 50% 70%,#101c3d,#04060d 70%);box-shadow:0 0 60px #2a4dd02a inset,0 20px 60px #0008}
+#v3,#v2{position:absolute;inset:0}#v3 canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+#v2{display:none}#v2 svg{width:100%;height:100%}
+.bar{position:absolute;z-index:5;display:flex;flex-wrap:wrap;gap:8px}
+.top{top:12px;left:12px}.bot{bottom:12px;left:12px;right:12px;justify-content:center}
+button{font:inherit;font-size:13px;color:var(--tx);background:#0f1a36cc;border:1px solid var(--ln);padding:8px 14px;border-radius:999px;cursor:pointer;backdrop-filter:blur(6px);transition:.2s}
+button:hover{border-color:var(--sf);box-shadow:0 0 14px #ff993340}button.on{background:linear-gradient(90deg,#ff993333,#19c37d33);border-color:var(--sf)}
+.hint{position:absolute;top:14px;right:16px;font-size:12px;color:var(--mu);z-index:5;text-align:right}
+.pill{position:absolute;left:0;top:0;z-index:4;font-size:12px;padding:4px 10px;border:1px solid #ffffff40;border-radius:8px;background:#0a1226d9;white-space:nowrap;cursor:pointer;will-change:transform}
+.pill::before{content:"";position:absolute;top:50%;height:1px;width:70px;background:linear-gradient(90deg,#ffffff90,#ffffff10)}
+.pill.R::before{right:100%}.pill.L::before{left:100%;transform:scaleX(-1)}
+.pill.on,.pill:hover{border-color:var(--sf);background:#2a1a08e6;color:#fff}
+#tip{position:fixed;z-index:50;pointer-events:none;max-width:260px;background:#0b1328f2;border:1px solid var(--sf);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.45;box-shadow:0 10px 30px #000a;display:none}
+#tip b{color:var(--sf);display:block;font-size:13.5px;margin-bottom:3px}#tip i{color:var(--gr);font-style:normal}
+aside{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:14px;max-height:min(78vh,760px);overflow:auto}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{flex:1;border-radius:10px}
+aside h2{margin:2px 0 8px;font-size:18px}aside p{color:#c3cde4;font-size:14px;line-height:1.6;margin:8px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.st{background:#0a1226;border:1px solid var(--ln);border-radius:12px;padding:10px}.st small{color:var(--mu);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.8px}.st b{font-size:16px;color:var(--sf)}
+.pl{display:flex;flex-direction:column;gap:6px}.pl button{text-align:left;border-radius:10px;display:flex;gap:10px;align-items:center}.sw{width:12px;height:12px;border-radius:50%;flex:none}
+.card{margin-top:12px;background:#0a1226;border:1px solid var(--ln);border-left:3px solid var(--sf);border-radius:12px;padding:12px}
+.chip{display:inline-block;font-size:12px;padding:3px 9px;border-radius:999px;background:#19c37d22;border:1px solid #19c37d66;margin:2px 4px 2px 0}
+.note{font-size:11.5px;color:var(--mu);margin-top:12px}
+@keyframes fl{0%,100%{transform:scale(1,1)}50%{transform:scale(.8,1.25)}}
+.flame{transform-box:fill-box;transform-origin:top center;animation:fl .12s infinite}
+</style></head><body>
+<header><div><h1>🚀 VIKRAM-S · Skyroot Aerospace</h1><div class="sub">India’s first privately built rocket to reach space · Interactive 2D / 3D explorer</div></div>
+<div class="bar" style="position:static"><button id="b3" class="on">3D Model</button><button id="b2">2D Model</button></div></header>
+<main>
+<section class="stage" id="stage">
+<div class="hint" id="hint">Drag to rotate · Scroll to zoom · Hover parts</div>
+<div class="bar top"><button id="auto" class="on">⟳ Auto-rotate</button><button id="exp">💥 Exploded view</button></div>
+<div class="bar bot"><button id="launch">🔥 Launch!</button><button id="reset">Reset view</button></div>
+<div id="v3"></div><div id="v2"></div><div id="pills"></div>
+</section>
+<aside><div class="tabs"><button data-t="o" class="on">Overview</button><button data-t="p">Parts</button><button data-t="m">Materials</button></div><div id="pane"></div></aside>
+</main><div id="tip"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const og=[];for(let i=0;i<=12;i++){const t=i/12;og.push([5.2+t*.8,.2*Math.sqrt(1-t*t)])}
+const P=[
+{id:'nose',n:'Nose Cone & Fairing',c:'#3b5bc4',y:5.6,side:1,pts:og,s:'Streamlined shell that cuts through air and shields the payloads.',d:'The ogive nose cone reduces aerodynamic drag and protects the payloads from heat and pressure during the supersonic climb.',m:['Carbon-fibre composite shell','Thermal protection coating']},
+{id:'pay',n:'Payload Bay',c:'#19a35d',y:4.85,side:-1,pts:[[4.5,.2],[5.2,.2]],s:'Carried 3 customer payloads on the Prarambh mission.',d:'Holds the experiments flown on the 2022 flight, including payloads from Space Kidz India, N-Space Tech and Bazoomq (Armenia), mounted on a vibration-damped deck.',m:['Composite / aluminium-alloy deck','Vibration-damping mounts']},
+{id:'avi',n:'Avionics & Control Bay',c:'#ff9933',y:4.05,side:1,pts:[[3.6,.2],[4.5,.2]],s:'The brain: flight computer, sensors, telemetry.',d:'Houses the flight computer, inertial sensors, GPS/telemetry radios and batteries that guide the rocket and stream data to ground stations.',m:['Aluminium-alloy avionics frame','PCBs, Li-ion battery pack','Composite skin']},
+{id:'spin',n:'Spin-Stabilisation Thrusters',c:'#c9d3e8',y:3.7,side:-1,kind:'spin',s:'Small 3D-printed thrusters that spin the rocket for stability.',d:'Vikram-S was spin-stabilised: tiny thrusters set it rotating like a bullet so it holds a straight, stable path through ascent.',m:['3D-printed (additive) metal alloy thrusters']},
+{id:'mot',n:'Solid Rocket Motor (Kalam-class)',c:'#e9edf5',y:2.1,side:1,pts:[[.5,.2],[3.6,.2]],s:'Single-stage solid-fuel motor that supplies all the thrust.',d:'Skyroot’s solid motors are named “Kalam” after Dr. A.P.J. Abdul Kalam. The casing holds the solid propellant grain that burns from the inside out to push the rocket to roughly 89 km.',m:['Carbon-fibre composite casing','Solid composite propellant (HTPB-class)','Insulating liner']},
+{id:'fin',n:'Aerodynamic Fins',c:'#ff9933',y:.6,side:-1,kind:'fin',s:'Four fins that keep the rocket flying straight.',d:'Swept fins at the base move the centre of pressure behind the centre of gravity, which keeps the rocket stable in flight.',m:['Composite / light alloy (indicative)']},
+{id:'noz',n:'Nozzle',c:'#b9753a',y:.25,side:1,pts:[[0,.17],[.12,.14],[.3,.1],[.5,.09]],s:'Turns hot gas into thrust.',d:'The bell-shaped nozzle accelerates burning gases to supersonic speed. Its throat survives extreme temperatures thanks to heat-resistant inserts.',m:['Graphite / carbon-phenolic throat insert','Ablative liner','Metal or composite shell']}
+];
+const OV=`<h2>Vikram-S</h2><p>Named after Vikram Sarabhai, the father of the Indian space programme, <b>Vikram-S</b> (“S” for suborbital) was built by Hyderabad-based <b>Skyroot Aerospace</b>. On <b>18 Nov 2022</b> it lifted off from ISRO’s Sriharikota spaceport on the <b>“Prarambh”</b> (The Beginning) mission, making Skyroot the first Indian private company to launch a rocket into space.</p>
+<div class="grid"><div class="st"><small>Height</small><b>≈ 6 m</b></div><div class="st"><small>Lift-off mass</small><b>≈ 545 kg</b></div><div class="st"><small>Apogee</small><b>≈ 89.5 km</b></div><div class="st"><small>Stages</small><b>1 (solid)</b></div></div>
+<p>It was a single-stage, spin-stabilised rocket with a carbon-composite structure and 3D-printed thrusters, carrying three customer payloads on a flight of about five minutes.</p>
+<p><b>What’s next?</b> Skyroot’s orbital rocket <b>Vikram-1</b> is a ≈20 m multi-stage vehicle with carbon-composite solid stages and a 3D-printed liquid upper stage engine, designed for small satellites.</p>
+<p class="note">Figures are approximate and this model is an illustrative reconstruction, not an engineering drawing. Hover any part, or open the Parts tab.</p>`;
+let sel=null,mode=3,auto=true,ex=0,exT=0,ry=0,launching=false,vy=0;
+const $=s=>document.querySelector(s),tip=$('#tip');
+function showTip(id,e){if(!id){tip.style.display='none';return}const p=P.find(q=>q.id===id);tip.innerHTML=`<b>${p.n}</b>${p.s}<br><i>Material: ${p.m[0]}</i>`;tip.style.display='block';const x=Math.min(e.clientX+16,innerWidth-280);tip.style.left=x+'px';tip.style.top=(e.clientY+16)+'px'}
+function hi(id){P.forEach(p=>{if(p.mesh)p.mesh.forEach(m=>m.material.emissive.set(id===p.id||sel===p.id?p.c:'#000'));if(p.mesh)p.mesh.forEach(m=>m.material.emissiveIntensity=id===p.id?.55:sel===p.id?.35:0)});document.querySelectorAll('[data-pid]').forEach(e=>e.classList.toggle('on',e.dataset.pid===id||e.dataset.pid===sel))}
+function pick(id){sel=id;hi(null);tab('p',true)}
+/* ---------- 3D ---------- */
+const W=()=>$('#stage').clientWidth,H=()=>$('#stage').clientHeight;
+const R=new THREE.WebGLRenderer({antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));$('#v3').appendChild(R.domElement);
+const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(40,1,.1,500);
+S.add(new THREE.AmbientLight(0x6678aa,.9));const dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(5,8,6);S.add(dl);
+const rl=new THREE.PointLight(0xff9933,1.2,30);rl.position.set(-4,1,-3);S.add(rl);const gl=new THREE.PointLight(0x19c37d,.8,30);gl.position.set(4,5,-4);S.add(gl);
+const sg=new THREE.BufferGeometry(),sp=[];for(let i=0;i<1500;i++){const v=new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize().multiplyScalar(80+Math.random()*60);sp.push(v.x,v.y,v.z)}
+sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));S.add(new THREE.Points(sg,new THREE.PointsMaterial({size:.5,color:0xbcd0ff})));
+const pad=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.8,.1,48),new THREE.MeshStandardMaterial({color:0x1a2340,metalness:.7,roughness:.4}));pad.position.y=-.06;S.add(pad);
+const grid=new THREE.GridHelper(30,30,0x2a4dd0,0x16213f);grid.position.y=-.1;S.add(grid);
+const rocket=new THREE.Group();S.add(rocket);
+const mat=c=>new THREE.MeshStandardMaterial({color:c,metalness:.55,roughness:.3,side:THREE.DoubleSide});
+P.forEach(p=>{p.g=new THREE.Group();rocket.add(p.g);p.mesh=[];const add=(geo,pos,rot)=>{const m=new THREE.Mesh(geo,mat(p.c));if(pos)m.position.copy(pos);if(rot)m.rotation.set(...rot);m.userData.id=p.id;p.g.add(m);p.mesh.push(m);return m};
+if(p.pts)add(new THREE.LatheGeometry(p.pts.map(a=>new THREE.Vector2(a[1],a[0])),56));
+if(p.kind==='fin'){const sh=new THREE.Shape([[.19,1.2],[.19,.25],[.6,-.05],[.6,.35]].map(a=>new THREE.Vector2(...a)));for(let k=0;k<4;k++){const m=add(new THREE.ExtrudeGeometry(sh,{depth:.035,bevelEnabled:false}),new THREE.Vector3(0,0,-.0175));m.geometry.translate(0,0,0);const q=new THREE.Group();p.g.remove(m);q.add(m);q.rotation.y=k*Math.PI/2;p.g.add(q)}}
+if(p.kind==='spin'){for(let k=0;k<4;k++){const q=new THREE.Group();const m=add(new THREE.CylinderGeometry(.035,.05,.18,16),new THREE.Vector3(.23,3.7,0),[Math.PI/2,0,0]);p.g.remove(m);q.add(m);q.rotation.y=k*Math.PI/2;p.g.add(q)}}
+});
+// stripes
+[[3.55,.205,'#ff9933'],[5.2,.205,'#19c37d']].forEach(([y,r,c])=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.05,56,1,true),new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.5}));m.position.y=y;rocket.add(m)});
+const flame=new THREE.Group();const f1=new THREE.Mesh(new THREE.ConeGeometry(.15,1.6,20,1,true),new THREE.MeshBasicMaterial({color:0xff7a1a,transparent:true,opacity:.75,blending:THREE.AdditiveBlending}));const f2=new THREE.Mesh(new THREE.ConeGeometry(.08,1,20,1,true),new THREE.MeshBasicMaterial({color:0xfff3b0,transparent:true,opacity:.9,blending:THREE.AdditiveBlending}));
+f1.rotation.x=Math.PI;f1.position.y=-.8;f2.rotation.x=Math.PI;f2.position.y=-.5;flame.add(f1,f2);flame.visible=false;rocket.add(flame);
+const fl=new THREE.PointLight(0xff8a2a,0,12);fl.position.y=-.4;rocket.add(fl);
+let th=.6,ph=1.35,dist=40,dT=15,ty=3,dragging=false,lx=0,ly=0;
+const pills=$('#pills');P.forEach(p=>{const e=document.createElement('div');e.className='pill '+(p.side>0?'R':'L');e.textContent=p.n;e.dataset.pid=p.id;e.onmouseenter=ev=>{hi(p.id);showTip(p.id,ev)};e.onmousemove=ev=>showTip(p.id,ev);e.onmouseleave=()=>{hi(null);showTip(null)};e.onclick=()=>pick(p.id);pills.appendChild(e);p.pill=e});
+const cv=R.domElement,rc=new THREE.Raycaster(),mv=new THREE.Vector2();
+cv.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing'});
+cv.addEventListener('pointerup',()=>{dragging=false;cv.style.cursor='grab'});
+cv.addEventListener('pointermove',e=>{if(dragging){th-=(e.clientX-lx)*.008;ph=Math.max(.2,Math.min(2.6,ph-(e.clientY-ly)*.006));lx=e.clientX;ly=e.clientY;showTip(null);return}
+const r=cv.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);rc.setFromCamera(mv,C);const h=rc.intersectObjects(rocket.children,true).find(x=>x.object.userData.id);const id=h?h.object.userData.id:null;hi(id);showTip(id,e)});
+cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);rc.setFromCamera(mv,C);const h=rc.intersectObjects(rocket.children,true).find(x=>x.object.userData.id);if(h)pick(h.object.userData.id)});
+cv.addEventListener('pointerleave',()=>showTip(null));
+cv.addEventListener('wheel',e=>{e.preventDefault();dT=Math.max(6,Math.min(30,dT+e.deltaY*.01))},{passive:false});
+const OFF={noz:-.8,fin:-.4,mot:0,spin:.3,avi:.6,pay:1,nose:1.5};
+const v=new THREE.Vector3();
+function loop(){requestAnimationFrame(loop);
+ex+=(exT-ex)*.08;dist+=(dT-dist)*.05;
+if(launching){vy+=.0035;ry+=vy;if(ry>48){launching=false;ry=0;vy=0;flame.visible=false;fl.intensity=0;$('#launch').textContent='🔥 Launch!';ty=3}}
+rocket.position.y=ry;flame.visible=launching;fl.intensity=launching?2.5:0;if(launching){const k=1+Math.random()*.35;f1.scale.set(1,k,1);f2.scale.set(1,1.2-Math.random()*.4,1)}
+P.forEach(p=>p.g.position.y=(OFF[p.id]||0)*ex);
+const tgt=launching?3+ry*.8:3;ty+=(tgt-ty)*.1;
+if(auto&&!dragging&&!launching)th+=.004;
+C.position.set(dist*Math.sin(ph)*Math.sin(th),ty+dist*Math.cos(ph),dist*Math.sin(ph)*Math.cos(th));C.lookAt(0,ty,0);
+if(mode===3){R.render(S,C);P.forEach(p=>{v.set(0,p.y+(OFF[p.id]||0)*ex+ry,0);v.project(C);const x=(v.x+1)/2*W(),y=(1-v.y)/2*H();p.pill.style.display=launching?'none':'block';p.pill.style.transform=`translate(${x+p.side*80}px,${y}px) translate(${p.side>0?0:-100}%,-50%)`})}}
+function size(){R.setSize(W(),H());C.aspect=W()/H();C.updateProjectionMatrix();dT0()}
+function dT0(){if(!window._init){window._init=1;dist=45}}
+new ResizeObserver(size).observe($('#stage'));size();dT=W()<500?24:17;loop();
+/* ---------- 2D ---------- */
+const cx=210,by=720,sc=100,xs=1.7,Y=y=>by-y*sc;
+function svg2(){let s=`<svg viewBox="0 0 420 780" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="gl" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".35" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient><linearGradient id="fg" y1="0" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#ff7a1a"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></linearGradient></defs>`;
+s+=`<g stroke="#1e2a48" stroke-width=".6">`;for(let i=0;i<=420;i+=30)s+=`<line x1="${i}" y1="0" x2="${i}" y2="780"/>`;for(let i=0;i<=780;i+=30)s+=`<line x1="0" y1="${i}" x2="420" y2="${i}"/>`;s+=`</g><rect x="60" y="${by}" width="300" height="8" rx="4" fill="#1a2340"/>`;
+s+=`<g id="rk"><g class="flame-g" id="fg2" style="display:none"><path class="flame" d="M${cx-14} ${by} Q${cx} ${by+120} ${cx+14} ${by} Z" fill="url(#fg)"/></g>`;
+P.forEach(p=>{s+=`<g data-pid="${p.id}" class="part" style="cursor:pointer">`;
+if(p.pts){const R_=p.pts.map(a=>`${cx+a[1]*sc*xs},${Y(a[0])}`),L=[...p.pts].reverse().map(a=>`${cx-a[1]*sc*xs},${Y(a[0])}`);s+=`<polygon points="${[...R_,...L].join(' ')}" fill="${p.c}" stroke="#fff" stroke-opacity=".6" stroke-width="1.2"/><polygon points="${[...R_,...L].join(' ')}" fill="url(#gl)"/>`}
+if(p.kind==='fin')[1,-1].forEach(d=>s+=`<polygon points="${[[.19,1.2],[.19,.25],[.6,-.05],[.6,.35]].map(a=>`${cx+d*a[0]*sc*xs},${Y(a[1])}`).join(' ')}" fill="${p.c}" stroke="#fff" stroke-opacity=".6"/>`);
+if(p.kind==='spin')[1,-1].forEach(d=>s+=`<rect x="${cx+d*.2*sc*xs+(d>0?0:-12)}" y="${Y(3.78)}" width="12" height="16" rx="3" fill="${p.c}" stroke="#fff" stroke-opacity=".7"/>`);
+s+=`</g>`});s+=`</g><g id="lb">`;
+P.forEach(p=>{const y=Y(p.y),x0=cx+p.side*(p.kind==='fin'?.55:.2)*sc*xs,x1=p.side>0?300:120;s+=`<g data-pid="${p.id}" class="lab" style="cursor:pointer"><line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#ffffff70" stroke-dasharray="3 3"/><circle cx="${x0}" cy="${y}" r="3" fill="#ff9933"/><text x="${x1+(p.side>0?6:-6)}" y="${y+4}" fill="#e8edf8" font-size="12.5" text-anchor="${p.side>0?'start':'end'}">${p.n.length>22?p.n.replace(' (Kalam-class)','').replace('Spin-Stabilisation','Spin')+'':p.n}</text></g>`});
+s+=`</g></svg>`;$('#v2').innerHTML=s;
+document.querySelectorAll('#v2 [data-pid]').forEach(e=>{const id=e.dataset.pid;e.onmouseenter=ev=>{hi(id);showTip(id,ev)};e.onmousemove=ev=>showTip(id,ev);e.onmouseleave=()=>{hi(null);showTip(null)};e.onclick=()=>pick(id)})}
+svg2();
+const origHi=hi;hi=function(id){origHi(id);document.querySelectorAll('#v2 .part').forEach(e=>{const on=e.dataset.pid===id||e.dataset.pid===sel;e.style.filter=on?'drop-shadow(0 0 8px #ff9933) brightness(1.25)':''});document.querySelectorAll('#v2 .lab text').forEach(t=>t.setAttribute('fill',t.parentNode.dataset.pid===id||t.parentNode.dataset.pid===sel?'#ff9933':'#e8edf8'))};
+function loop2(){requestAnimationFrame(loop2);if(mode!==2)return;const rk=$('#rk');if(!rk)return;rk.setAttribute('transform',`translate(0,${-ry*20})`);$('#fg2').style.display=launching?'block':'none';$('#lb').style.opacity=launching?0:1}
+loop2();
+/* ---------- UI ---------- */
+function setMode(m){mode=m;$('#v3').style.display=m===3?'block':'none';$('#v2').style.display=m===2?'block':'none';$('#pills').style.display=m===3?'block':'none';$('#b3').classList.toggle('on',m===3);$('#b2').classList.toggle('on',m===2);$('#auto').style.display=$('#exp').style.display=$('#hint').style.display=m===3?'':'none';$('#reset').style.display=m===3?'':'none'}
+$('#b3').onclick=()=>setMode(3);$('#b2').onclick=()=>setMode(2);
+$('#auto').onclick=e=>{auto=!auto;e.target.classList.toggle('on',auto)};
+$('#exp').onclick=e=>{exT=exT?0:1;e.target.classList.toggle('on',!!exT)};
+$('#reset').onclick=()=>{th=.6;ph=1.35;dT=W()<500?24:17;exT=0;$('#exp').classList.remove('on')};
+$('#launch').onclick=e=>{if(launching)return;launching=true;vy=0;ry=0;e.target.textContent='🔥 Lift-off…'};
+function tab(t,keep){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));let h='';
+if(t==='o')h=OV;
+if(t==='p'){h=`<h2>Parts of the rocket</h2><p>Select a part, or hover it on the model.</p><div class="pl">`+P.map(p=>`<button data-pid="${p.id}"><span class="sw" style="background:${p.c}"></span>${p.n}</button>`).join('')+`</div>`;const p=P.find(q=>q.id===sel);if(p)h+=`<div class="card"><b style="color:var(--sf)">${p.n}</b><p>${p.d}</p>${p.m.map(m=>`<span class="chip">${m}</span>`).join('')}</div>`}
+if(t==='m')h=`<h2>Materials used</h2><p>Skyroot’s strategy is light, strong and quick to make: carbon composites for structures and 3D printing for complex engine parts.</p>`+P.map(p=>`<div class="card" data-pid="${p.id}" style="border-left-color:${p.c}"><b>${p.n}</b><div style="margin-top:6px">${p.m.map(m=>`<span class="chip">${m}</span>`).join('')}</div></div>`).join('')+`<p class="note">Material details are based on public reports and are partly indicative.</p>`;
+$('#pane').innerHTML=h;$('#pane').querySelectorAll('[data-pid]').forEach(e=>{const id=e.dataset.pid;e.onmouseenter=()=>hi(id);e.onmouseleave=()=>hi(null);e.onclick=()=>{sel=id;tab('p',true)}});hi(null)}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+tab('o');setMode(3);
+</script></body></html>
