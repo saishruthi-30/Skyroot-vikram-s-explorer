@@ -2,7 +2,7 @@
 
 An interactive **2D and 3D model** of **Vikram-S**, the rocket built by Skyroot Aerospace and launched from Sriharikota in November 2022. It was India's first privately developed rocket to reach space.
 
-🔗 **Live demo:** https://YOUR-USERNAME.github.io/Skyroot-vikram-s-explorer/
+🔗 **Live demo:** https://saishruthi-30.github.io/Skyroot-vikram-s-explorer/
 
 ## ✨ Features
 
